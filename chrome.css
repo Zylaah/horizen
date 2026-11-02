@@ -1,0 +1,151 @@
+/*
+ * Horizen step 1. The toolbox is the top band of the window. The toolbar sits
+ * under the tab strip. Tabs in the active workspace run in one row.
+ * Essentials and pinned folders are not split into their own slots yet.
+ */
+
+:root[horizen-layout="true"] {
+  --horizen-tab-row: 42px;
+
+  & #browser {
+    flex-direction: column !important;
+  }
+
+  & #navigator-toolbox {
+    order: -1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  & #titlebar {
+    flex-direction: column !important;
+    height: auto !important;
+    width: 100% !important;
+    padding-top: 0 !important;
+  }
+
+  & #TabsToolbar {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    height: var(--horizen-tab-row) !important;
+    min-height: var(--horizen-tab-row) !important;
+    max-height: var(--horizen-tab-row) !important;
+  }
+
+  & #tabbrowser-tabs,
+  & #TabsToolbar-customization-target {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: auto !important;
+  }
+
+  & #TabsToolbar-customization-target {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  & #TabsToolbar > * {
+    justify-content: flex-start !important;
+  }
+
+  & #zen-tabs-wrapper {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+    height: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  & #zen-appcontent-navbar-wrapper {
+    display: none !important;
+  }
+
+  & #zen-appcontent-wrapper {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+  }
+
+  & #nav-bar {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  & zen-workspace {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  & zen-workspace > arrowscrollbox {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: none !important;
+  }
+
+  & .zen-workspace-tabs-section,
+  & zen-folder,
+  & zen-folder > .tab-group-container {
+    flex-direction: row !important;
+  }
+
+  & .zen-workspace-tabs-section,
+  & zen-folder {
+    width: auto !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    margin-inline-start: 0 !important;
+  }
+
+  & .zen-workspace-normal-tabs-section {
+    flex: 1 1 auto !important;
+  }
+
+  & .zen-current-workspace-indicator,
+  & .zen-workspace-empty-space,
+  & .zen-workspace-scroll-to-tab {
+    display: none !important;
+  }
+
+  & #zen-essentials {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  & .zen-essentials-container {
+    position: relative !important;
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
+    padding: 0 !important;
+  }
+
+  & .tabbrowser-tab[zen-essential="true"] {
+    width: 36px !important;
+    flex: 0 0 36px !important;
+  }
+
+  & #tabbrowser-tabs .tabbrowser-tab {
+    margin-inline-start: 0 !important;
+  }
+
+  & #zen-sidebar-foot-buttons,
+  & #zen-workspaces-button {
+    flex-direction: row !important;
+    width: auto !important;
+    height: 100% !important;
+  }
+}

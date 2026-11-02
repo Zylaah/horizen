@@ -1,0 +1,19 @@
+{
+  "id": "horizen",
+  "name": "Horizen",
+  "description": "Classic Firefox tab strip for Zen, laid out across the top of the window.",
+  "author": "horizen",
+  "version": "0.1.0",
+  "homepage": "https://github.com/horizen/horizen",
+  "tags": ["tabs", "layout"],
+  "fork": ["zen"],
+  "preferences": "preferences.json",
+  "style": {
+    "chrome": "chrome.css"
+  },
+  "scripts": {
+    "horizen.uc.js": {
+      "include": ["chrome://browser/content/browser.xhtml"]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+[
+  {
+    "property": "horizen.layout.enabled",
+    "label": "Top tab strip",
+    "type": "checkbox",
+    "defaultValue": true
+  }
+]
