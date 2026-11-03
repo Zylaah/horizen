@@ -1,6 +1,6 @@
-// Horizen, step 1: put Zen's toolbox across the top of the window and the
-// toolbar under the tab strip. Reserved essentials and pinned-folder slots
-// come later. Restart Zen after changing this file.
+// Horizen, step 1. The layout itself is in chrome.css. This script only
+// marks the window, and takes the mark off in compact mode and popups.
+// Restart Zen after changing either file.
 (() => {
   if (window.__horizenLoaded) {
     return;
@@ -24,91 +24,13 @@
     root.getAttribute("zen-compact-mode") === "true" ||
     root.hasAttribute("customizing");
 
-  function setOrient(value) {
-    const tabs = window.gBrowser?.tabContainer;
-    if (!tabs) {
-      return;
-    }
-    tabs.setAttribute("orient", value);
-    const main = tabs.arrowScrollbox;
-    if (main) {
-      main.setAttribute("orient", value);
-      main.scrollbox?.setAttribute("orient", value);
-    }
-    for (const box of document.querySelectorAll("zen-workspace arrowscrollbox")) {
-      box.setAttribute("orient", value);
-      box.scrollbox?.setAttribute("orient", value);
-    }
-  }
-
-  function parkToolbar() {
-    const titlebar = document.getElementById("titlebar");
-    const navbar = document.getElementById("nav-bar");
-    const bookmarks = document.getElementById("PersonalToolbar");
-    if (!titlebar || !navbar) {
-      return;
-    }
-    if (navbar.previousElementSibling !== titlebar) {
-      titlebar.after(navbar);
-    }
-    if (bookmarks && bookmarks.previousElementSibling !== navbar) {
-      navbar.after(bookmarks);
-    }
-    document.getElementById("navigator-toolbox")?.style.removeProperty("max-width");
-    parkWindowButtons();
-  }
-
-  // Zen parks the caption buttons in the content toolbar, which this layout
-  // hides. Classic Firefox keeps them at the end of the tab strip.
-  function parkWindowButtons() {
-    const toolbar = document.getElementById("TabsToolbar");
-    const buttons = document.querySelector(
-      ".titlebar-buttonbox-container:has(#titlebar-close, #titlebar-min)"
-    );
-    if (toolbar && buttons && buttons.parentElement !== toolbar) {
-      toolbar.appendChild(buttons);
-    }
-  }
-
-  function restoreWindowButtons() {
-    const buttons = document.querySelector(
-      "#TabsToolbar > .titlebar-buttonbox-container"
-    );
-    const navbar = document.getElementById("nav-bar");
-    if (buttons && navbar) {
-      navbar.appendChild(buttons);
-    }
-  }
-
-  function restoreToolbar() {
-    const container = document.getElementById("zen-appcontent-navbar-container");
-    if (!container) {
-      return;
-    }
-    const navbar = document.getElementById("nav-bar");
-    const bookmarks = document.getElementById("PersonalToolbar");
-    if (navbar && navbar.parentElement !== container) {
-      container.appendChild(navbar);
-    }
-    if (bookmarks && bookmarks.parentElement !== container) {
-      container.appendChild(bookmarks);
-    }
-    restoreWindowButtons();
-  }
-
   function apply() {
     if (!enabled() || skipped()) {
       root.removeAttribute("horizen-layout");
-      restoreToolbar();
-      setOrient("vertical");
       return;
     }
     root.setAttribute("horizen-layout", "true");
-    parkToolbar();
-    setOrient("horizontal");
   }
-
-  window.__horizenApply = apply;
 
   const manager = window.gZenVerticalTabsManager;
   if (manager && !manager._updateEvent.__horizen) {
@@ -116,21 +38,12 @@
     const wrapped = function (...args) {
       const result = original.apply(this, args);
       if (window.__horizenReady) {
-        window.__horizenApply?.();
+        apply();
       }
       return result;
     };
     wrapped.__horizen = true;
     manager._updateEvent = wrapped;
-  }
-
-  const strip = document.getElementById("tabbrowser-arrowscrollbox");
-  if (strip) {
-    new MutationObserver(() => {
-      if (root.getAttribute("horizen-layout") === "true") {
-        setOrient("horizontal");
-      }
-    }).observe(strip, { childList: true });
   }
 
   new MutationObserver(apply).observe(root, {

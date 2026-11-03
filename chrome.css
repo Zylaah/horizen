@@ -1,139 +1,108 @@
 /*
- * Horizen step 1. The toolbox is the top band of the window. The toolbar sits
- * under the tab strip. Tabs in the active workspace run in one row.
- * Essentials and pinned folders are not split into their own slots yet.
+ * Horizen step 1, following the approach in Forbidden Horizontal Tabs:
+ * leave Zen's nodes where they are, turn the titlebar into one 40px row,
+ * and let the active workspace's tabs run sideways inside it.
  */
 
 :root[horizen-layout="true"] {
-  --horizen-tab-row: 42px;
-
   & #browser {
+    display: flex !important;
     flex-direction: column !important;
   }
 
   & #navigator-toolbox {
+    display: flex !important;
+    flex-direction: row !important;
+    position: relative !important;
     order: -1 !important;
     width: 100% !important;
+    min-width: 100% !important;
     max-width: none !important;
-    min-width: 0 !important;
-    height: auto !important;
-    flex: 0 0 auto !important;
+    height: 40px !important;
+    min-height: 40px !important;
     margin: 0 !important;
+    padding: 0 !important;
   }
 
   & #titlebar {
     display: flex !important;
-    flex-direction: column !important;
-    height: auto !important;
+    flex-direction: row !important;
     width: 100% !important;
-    padding-top: 0 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+  }
+
+  & #TabsToolbar,
+  & #tabbrowser-tabs,
+  & #TabsToolbar-customization-target,
+  & tabs {
+    display: flex !important;
+    flex-direction: row !important;
+    height: 40px !important;
+    min-height: 0 !important;
+    max-height: 40px !important;
   }
 
   & #TabsToolbar {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
+    flex: 1 1 auto !important;
     width: 100% !important;
-    height: auto !important;
-    min-height: var(--horizen-tab-row) !important;
-    max-height: none !important;
-    overflow: visible !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+    padding-right: 138px !important;
+    align-items: center !important;
   }
 
   & #tabbrowser-tabs,
-  & #TabsToolbar-customization-target {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    height: auto !important;
-    min-height: var(--horizen-tab-row) !important;
-    max-height: none !important;
-  }
-
-  & #tabbrowser-tabs,
-  & #TabsToolbar-customization-target {
+  & #TabsToolbar-customization-target,
+  & #zen-tabs-wrapper,
+  & #tabbrowser-arrowscrollbox {
     flex: 1 1 auto !important;
     min-width: 0 !important;
     width: auto !important;
-  }
-
-  & #TabsToolbar > * {
-    justify-content: flex-start !important;
+    max-width: none !important;
   }
 
   & #zen-tabs-wrapper,
   & #tabbrowser-arrowscrollbox {
     position: relative !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    width: 100% !important;
-    height: var(--horizen-tab-row) !important;
-    min-height: var(--horizen-tab-row) !important;
-    margin: 0 !important;
+    height: 40px !important;
     overflow: hidden !important;
-  }
-
-  & #TabsToolbar > .titlebar-buttonbox-container {
-    display: flex !important;
-    align-items: center !important;
-    flex: 0 0 auto !important;
-    height: auto !important;
-    min-height: var(--horizen-tab-row) !important;
-    margin-left: auto !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  & #zen-appcontent-navbar-wrapper {
-    display: none !important;
-  }
-
-  & #zen-appcontent-wrapper {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    width: 100% !important;
-  }
-
-  /* The left inset is 0 while a sidebar owns that edge. The page keeps
-     Zen's separation on every side once the strip is the top band. */
-  & #zen-tabbox-wrapper {
-    margin: var(--zen-element-separation) !important;
-  }
-
-  & #nav-bar {
-    width: 100% !important;
     margin: 0 !important;
   }
 
+  & #tabbrowser-tabs[orient="vertical"] {
+    flex-direction: row !important;
+  }
+
+  /* The workspace is absolutely positioned. Without top: 0 it sits below
+     this short row and the tabs are clipped. */
   & zen-workspace {
-    display: flex !important;
-    flex-direction: column !important;
-    position: absolute !important;
-    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 40px !important;
     contain: none !important;
     overflow: hidden !important;
   }
 
   & zen-workspace > arrowscrollbox {
-    display: flex !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: 100% !important;
+    height: 40px !important;
     max-height: none !important;
+    overflow: hidden !important;
   }
 
-  & zen-workspace > arrowscrollbox::part(scrollbox) {
+  & zen-workspace > arrowscrollbox::part(scrollbox),
+  & #tabbrowser-arrowscrollbox::part(scrollbox),
+  & zen-workspace arrowscrollbox box.scrollbox-clip > scrollbox > slot,
+  & #tabbrowser-arrowscrollbox box.scrollbox-clip > scrollbox > slot {
     display: flex !important;
     flex-direction: row !important;
-    -moz-box-orient: horizontal !important;
-    align-items: stretch !important;
-    height: 100% !important;
+    align-items: center !important;
     width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding-block-end: 0 !important;
+    height: 40px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
   }
 
   & .zen-workspace-tabs-section,
@@ -141,63 +110,68 @@
   & zen-folder > .tab-group-container {
     display: flex !important;
     flex-direction: row !important;
-    -moz-box-orient: horizontal !important;
-  }
-
-  & .zen-workspace-tabs-section,
-  & zen-folder {
+    align-items: center !important;
+    height: 40px !important;
+    max-height: 40px !important;
     width: auto !important;
-    height: 100% !important;
-    min-width: 0 !important;
-    margin-inline-start: 0 !important;
+    margin: 0 !important;
   }
 
   & .zen-workspace-pinned-tabs-section {
     flex: 0 0 auto !important;
-    max-width: 40% !important;
-  }
-
-  & .pinned-tabs-container-separator {
-    width: 8px !important;
-    height: 100% !important;
-    flex: 0 0 auto !important;
+    width: max-content !important;
+    max-width: none !important;
   }
 
   & .zen-workspace-normal-tabs-section {
     flex: 1 1 auto !important;
     min-width: 0 !important;
-    overflow: hidden !important;
   }
 
-  & #tabbrowser-tabs .tabbrowser-tab:not([zen-essential="true"]) {
-    flex: 1 1 140px !important;
-    width: auto !important;
-    min-width: 48px !important;
-    max-width: 220px !important;
-    height: var(--horizen-tab-row) !important;
+  & .pinned-tabs-container-separator {
+    width: 8px !important;
+    min-width: 8px !important;
+    height: 16px !important;
+    flex: 0 0 auto !important;
   }
 
-  & #tabbrowser-tabs .tabbrowser-tab:not([zen-essential="true"]) .tab-background {
-    width: 100% !important;
+  & .zen-current-workspace-indicator,
+  & #zen-current-workspace-indicator-container,
+  & .zen-workspace-empty-space,
+  & .zen-workspace-scroll-to-tab,
+  & #zen-sidebar-splitter,
+  & #zen-media-controls-toolbar {
+    display: none !important;
+  }
+
+  & .tabbrowser-tab {
+    transform: none !important;
+    max-width: 200px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    flex: 1 1 150px !important;
+  }
+
+  & .tabbrowser-tab[selected] {
+    flex: 2 1 150px !important;
+  }
+
+  & .tabbrowser-tab[zen-essential="true"] {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
   }
 
   & #navigator-toolbox .tab-label-container {
     display: flex !important;
   }
 
-  & .zen-current-workspace-indicator,
-  & .zen-workspace-empty-space,
-  & .zen-workspace-scroll-to-tab {
-    display: none !important;
+  & #tabbrowser-tabs .tabbrowser-tab {
+    margin-inline-start: 0 !important;
   }
 
-  & #zen-essentials {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-  }
-
+  & #zen-essentials,
   & .zen-essentials-container {
     position: relative !important;
     display: flex !important;
@@ -205,23 +179,47 @@
     width: auto !important;
     min-width: 0 !important;
     max-width: none !important;
-    height: 100% !important;
+    height: 40px !important;
+    margin: 0 !important;
     padding: 0 !important;
   }
 
-  & .tabbrowser-tab[zen-essential="true"] {
-    width: 36px !important;
-    flex: 0 0 36px !important;
-  }
-
-  & #tabbrowser-tabs .tabbrowser-tab {
-    margin-inline-start: 0 !important;
+  & .zen-essentials-container:empty,
+  & #zen-essentials:empty {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   & #zen-sidebar-foot-buttons,
   & #zen-workspaces-button {
+    display: flex !important;
     flex-direction: row !important;
     width: auto !important;
-    height: 100% !important;
+    height: 40px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+  }
+
+  /* Caption buttons stay in whatever row Zen gave them. Pin them to the
+     top-right of the window so the hidden sidebar cannot take them with it. */
+  & .titlebar-buttonbox-container {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: auto !important;
+    height: 40px !important;
+    margin: 0 !important;
+    transform: none !important;
+    z-index: 1000 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Zen zeroes the left margin because the sidebar owns that edge. */
+  & #zen-tabbox-wrapper {
+    margin: var(--zen-element-separation) !important;
   }
 }
