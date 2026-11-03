@@ -55,6 +55,29 @@
       navbar.after(bookmarks);
     }
     document.getElementById("navigator-toolbox")?.style.removeProperty("max-width");
+    parkWindowButtons();
+  }
+
+  // Zen parks the caption buttons in the content toolbar, which this layout
+  // hides. Classic Firefox keeps them at the end of the tab strip.
+  function parkWindowButtons() {
+    const toolbar = document.getElementById("TabsToolbar");
+    const buttons = document.querySelector(
+      ".titlebar-buttonbox-container:has(#titlebar-close, #titlebar-min)"
+    );
+    if (toolbar && buttons && buttons.parentElement !== toolbar) {
+      toolbar.appendChild(buttons);
+    }
+  }
+
+  function restoreWindowButtons() {
+    const buttons = document.querySelector(
+      "#TabsToolbar > .titlebar-buttonbox-container"
+    );
+    const navbar = document.getElementById("nav-bar");
+    if (buttons && navbar) {
+      navbar.appendChild(buttons);
+    }
   }
 
   function restoreToolbar() {
@@ -70,6 +93,7 @@
     if (bookmarks && bookmarks.parentElement !== container) {
       container.appendChild(bookmarks);
     }
+    restoreWindowButtons();
   }
 
   function apply() {
