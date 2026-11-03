@@ -78,7 +78,125 @@
       }
       (tab.pinned ? pinned : normal).push(tab);
     }
-    return { essentials, pinned, normal };
+    return { essentials, pinned: pinnedItems(pinned), normal };
+  }
+
+  // The pinned band follows the order of the active space's pinned section,
+  // so loose pins and folders sit exactly as they do in the sidebar. A folder
+  // is one chip here, never its tabs.
+  function pinnedItems(fallbackTabs) {
+    const gz = window.gZenWorkspaces;
+    const container =
+      gz?.activeWorkspaceElement?.pinnedTabsContainer ?? gz?.pinnedTabsContainer;
+    if (!container) {
+      return fallbackTabs.map(tab => ({ tab }));
+    }
+    const items = [];
+    const addTab = tab => {
+      if (
+        tab &&
+        !tab.closing &&
+        !tab.hidden &&
+        !tab.hasAttribute("zen-empty-tab") &&
+        !tab.hasAttribute("zen-glance-tab") &&
+        !tab.hasAttribute("zen-essential")
+      ) {
+        items.push({ tab });
+      }
+    };
+    for (const child of container.children) {
+      if (child.localName === "tab") {
+        addTab(child);
+      } else if (child.isZenFolder) {
+        if (child.localName !== "zen-workspace-collapsible-pins") {
+          items.push({ folder: child });
+        }
+      } else if (child.tabs) {
+        child.tabs.forEach(addTab);
+      }
+    }
+    return items;
+  }
+
+  function folderTabs(folder) {
+    const found = [];
+    for (const item of folder.allItemsRecursive) {
+      if (item.localName === "tab") {
+        found.push(item);
+      } else if (!item.isZenFolder && item.tabs) {
+        found.push(...item.tabs);
+      }
+    }
+    return found.filter(tab => !tab.hasAttribute("zen-empty-tab"));
+  }
+
+  function folderEl(folder) {
+    const el = h("div", "horizen-folder");
+    el.folder = folder;
+    const name = folder.label || folder.name || "Folder";
+    el.title = name;
+    if (folderTabs(folder).includes(window.gBrowser.selectedTab)) {
+      el.setAttribute("active", "true");
+    }
+    const svg = folder.icon?.firstElementChild;
+    if (svg) {
+      h("span", "horizen-folder-icon", el).append(svg.cloneNode(true));
+    }
+    h("span", "horizen-folder-label", el).textContent = name;
+    return el;
+  }
+
+  function addTabItem(popup, tab) {
+    const item = document.createXULElement("menuitem");
+    item.setAttribute("label", tab.label || "");
+    item.setAttribute("class", "menuitem-iconic");
+    item.setAttribute(
+      "image",
+      tab.getAttribute("image") || "chrome://global/skin/icons/defaultFavicon.svg"
+    );
+    if (tab === window.gBrowser.selectedTab) {
+      item.setAttribute("default", "true");
+    }
+    item.addEventListener("command", () => {
+      window.gBrowser.selectedTab = tab;
+    });
+    popup.append(item);
+  }
+
+  function fillFolderMenu(popup, folder) {
+    let count = 0;
+    for (const item of folder.allItems) {
+      if (item.hasAttribute("zen-empty-tab")) {
+        continue;
+      }
+      count++;
+      if (item.isZenFolder) {
+        const menu = document.createXULElement("menu");
+        menu.setAttribute("label", item.label || item.name || "Folder");
+        const sub = document.createXULElement("menupopup");
+        menu.append(sub);
+        fillFolderMenu(sub, item);
+        popup.append(menu);
+      } else if (item.localName === "tab") {
+        addTabItem(popup, item);
+      } else if (item.tabs) {
+        item.tabs.forEach(tab => addTabItem(popup, tab));
+      }
+    }
+    if (!count) {
+      const empty = document.createXULElement("menuitem");
+      empty.setAttribute("label", "Empty folder");
+      empty.setAttribute("disabled", "true");
+      popup.append(empty);
+    }
+  }
+
+  function openFolder(el) {
+    const popup = document.createXULElement("menupopup");
+    fillFolderMenu(popup, el.folder);
+    document.getElementById("mainPopupSet").append(popup);
+    popup.addEventListener("popuphidden", () => popup.remove(), { once: true });
+    popup.openPopup(el, "after_start");
   }
 
   function tabEl(tab, kind) {
@@ -151,8 +269,8 @@
     if (essentials.length && (pinned.length || normal.length)) {
       divider(bar);
     }
-    for (const tab of pinned) {
-      bar.append(tabEl(tab, "pinned"));
+    for (const item of pinned) {
+      bar.append(item.folder ? folderEl(item.folder) : tabEl(item.tab, "pinned"));
     }
     if (pinned.length && normal.length) {
       divider(bar);
@@ -187,6 +305,11 @@
         } else {
           window.BrowserCommands?.openTab?.();
         }
+        return;
+      }
+      const folder = e.target.closest(".horizen-folder");
+      if (folder?.folder) {
+        openFolder(folder);
         return;
       }
       const el = e.target.closest(".horizen-tab");
@@ -306,6 +429,10 @@
     "ZenWorkspacesUIUpdate",
     "ZenWorkspaceDataChanged",
     "AfterWorkspacesSessionRestore",
+    "ZenFolderRenamed",
+    "TabGroupCreate",
+    "TabGroupRemoved",
+    "TabGroupUpdate",
   ];
 
   function listen() {

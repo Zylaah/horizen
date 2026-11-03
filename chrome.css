@@ -57,6 +57,7 @@
 
 .horizen-space,
 .horizen-tab,
+.horizen-folder,
 .horizen-newtab {
   -moz-window-dragging: no-drag;
   box-sizing: border-box;
@@ -130,8 +131,44 @@
 }
 
 .horizen-space:hover,
+.horizen-folder:hover,
 .horizen-newtab:hover {
   background: color-mix(in srgb, var(--horizen-fg, currentColor) 10%, transparent);
+}
+
+.horizen-folder {
+  flex: 0 0 auto;
+  max-width: 140px;
+  padding: 0 8px 0 4px;
+  gap: 4px;
+
+  &[active] {
+    background: color-mix(in srgb, var(--horizen-fg, currentColor) 16%, transparent);
+  }
+}
+
+.horizen-folder-icon {
+  display: flex;
+  flex: 0 0 auto;
+  pointer-events: none;
+
+  & svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+
+    & .dots {
+      display: none;
+    }
+  }
+}
+
+.horizen-folder-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
 
 .horizen-icon {
